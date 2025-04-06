@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Сталкер Пятнашки</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Courier New', Courier, monospace;
+      background-color: #000;
+      color: #32cd32;
+      text-align: center;
+    }
+    h1 {
+      margin-top: 20px;
+      text-shadow: 0 0 10px #32cd32;
+      font-size: 36px;
+    }
+    #board {
+      display: grid;
+      grid-template-columns: repeat(5, 80px);
+      grid-template-rows: repeat(4, 80px);
+      gap: 5px;
+      justify-content: center;
+      margin: 40px auto;
+      background: #111;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #32cd32;
+    }
+    .tile {
+      width: 80px;
+      height: 80px;
+      background-color: #222;
+      color: #32cd32;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 2px solid #32cd32;
+      box-shadow: inset 0 0 10px #32cd32;
+      transition: background-color 0.2s;
+    }
+    .tile:hover {
+      background-color: #2e2e2e;
+    }
+    .empty {
+      background: none;
+      border: none;
+      cursor: default;
+      box-shadow: none;
+    }
+    #win-message {
+      display: none;
+      font-size: 24px;
+      color: #00ff00;
+      text-shadow: 0 0 10px #00ff00;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Пятнашки Сталкера</h1>
+  <div id="board"></div>
+  <div id="win-message">Код от сейфа: <strong>9145</strong></div>
+
+  <script>
+    const board = document.getElementById('board');
+    let tiles = [...Array(19).keys()].map(i => i + 1);
+    tiles.push(null);
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function isSolved(arr) {
+      for (let i = 0; i < 19; i++) {
+        if (arr[i] !== i + 1) return false;
+      }
+      return arr[19] === null;
+    }
+
+    function render() {
+      board.innerHTML = '';
+      tiles.forEach((tile, idx) => {
+        const div = document.createElement('div');
+        div.className = tile ? 'tile' : 'tile empty';
+        if (tile) div.textContent = tile;
+        div.addEventListener('click', () => moveTile(idx));
+        board.appendChild(div);
+      });
+    }
+
+    function moveTile(index) {
+      const emptyIndex = tiles.indexOf(null);
+      const validMoves = [
+        emptyIndex - 1, emptyIndex + 1,
+        emptyIndex - 5, emptyIndex + 5
+      ];
+      if (validMoves.includes(index)) {
+        [tiles[emptyIndex], tiles[index]] = [tiles[index], tiles[emptyIndex]];
+        render();
+        if (isSolved(tiles)) {
+          document.getElementById('win-message').style.display = 'block';
+        }
+      }
+    }
+
+    shuffle(tiles);
+    render();
+  </script>
+</body>
+</html>
